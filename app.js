@@ -219,6 +219,67 @@ function updateProgress(percent) {
 }
 
 // ============================================
+// Image Enhancement (Fast)
+// ============================================
+async function applyEnhancement(imageSrc) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            // Draw original image
+            ctx.drawImage(img, 0, 0);
+
+            // Get image data
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+
+            // Apply subtle sharpening using unsharp mask technique
+            // We'll use a simplified fast version
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+
+            // Slight blur for unsharp mask
+            tempCtx.filter = 'blur(1px)';
+            tempCtx.drawImage(canvas, 0, 0);
+            const blurredData = tempCtx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+            // Apply unsharp mask + contrast enhancement
+            const sharpenAmount = 0.3; // Subtle sharpening
+            const contrastFactor = 1.08; // Subtle contrast boost
+
+            for (let i = 0; i < data.length; i += 4) {
+                // Unsharp mask: original + (original - blurred) * amount
+                for (let c = 0; c < 3; c++) {
+                    const original = data[i + c];
+                    const blurred = blurredData[i + c];
+                    let sharpened = original + (original - blurred) * sharpenAmount;
+
+                    // Apply contrast
+                    sharpened = ((sharpened / 255 - 0.5) * contrastFactor + 0.5) * 255;
+
+                    // Clamp values
+                    data[i + c] = Math.max(0, Math.min(255, sharpened));
+                }
+            }
+
+            // Put enhanced data back
+            ctx.putImageData(imageData, 0, 0);
+
+            // Return as base64
+            resolve(canvas.toDataURL('image/png'));
+        };
+        img.src = imageSrc;
+    });
+}
+
+// ============================================
 // Upscaling
 // ============================================
 async function handleUpscale() {
@@ -271,18 +332,25 @@ async function handleUpscale() {
             patchSize: 64,
             padding: 2,
             progress: (progress) => {
-                const percent = 50 + Math.round(progress * 45);
+                const percent = 50 + Math.round(progress * 35);
                 updateProgress(percent);
                 DOM.loaderStatus.textContent = `Aprimorando... ${Math.round(progress * 100)}%`;
                 DOM.loadingText.textContent = `Aprimorando... ${Math.round(progress * 100)}%`;
             }
         });
 
+        // Apply fast enhancement (sharpening + contrast)
+        updateProgress(90);
+        showLoading(true, 'Aplicando melhorias...');
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        const enhancedSrc = await applyEnhancement(upscaledSrc);
+
         updateProgress(100);
 
         // Display result
-        state.upscaledImageSrc = upscaledSrc;
-        displayUpscaledImage(upscaledSrc);
+        state.upscaledImageSrc = enhancedSrc;
+        displayUpscaledImage(enhancedSrc);
 
         // Enable download and comparison
         DOM.downloadBtn.disabled = false;
