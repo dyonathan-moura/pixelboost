@@ -371,6 +371,14 @@ body {
     flex-wrap: wrap;
 }
 
+.preview-container.single-preview {
+    justify-content: center;
+}
+
+.preview-container.single-preview .image-card {
+    max-width: 500px;
+}
+
 .image-card {
     flex: 1;
     min-width: 280px;

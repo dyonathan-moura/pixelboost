@@ -84,42 +84,27 @@
 
             <!-- Processing Section -->
             <section id="processing-section" class="processing-section hidden">
-                <!-- Original Image Preview -->
-                <div class="preview-container">
+                <!-- Original Image Preview (centered) -->
+                <div class="preview-container single-preview">
                     <div class="image-card original-card">
                         <div class="card-header">
-                            <span class="card-label">Original</span>
+                            <span class="card-label">Imagem Carregada</span>
                             <span id="original-size" class="card-size"></span>
                         </div>
                         <div class="image-wrapper">
                             <img id="original-image" src="" alt="Imagem original">
                         </div>
                     </div>
+                </div>
 
-                    <!-- Arrow -->
-                    <div class="arrow-container">
-                        <svg class="arrow-icon" viewBox="0 0 24 24" fill="none">
-                            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                    </div>
-
-                    <!-- Upscaled Image Preview -->
-                    <div class="image-card upscaled-card">
-                        <div class="card-header">
-                            <span class="card-label">Upscaled</span>
-                            <span id="upscaled-size" class="card-size"></span>
-                        </div>
-                        <div class="image-wrapper">
-                            <div id="loading-overlay" class="loading-overlay">
-                                <div class="spinner"></div>
-                                <p id="loading-text" class="loading-text">Carregando modelo...</p>
-                                <div class="progress-bar">
-                                    <div id="progress-fill" class="progress-fill"></div>
-                                </div>
-                            </div>
-                            <img id="upscaled-image" src="" alt="Imagem upscaled">
-                        </div>
+                <!-- Hidden elements for upscaled image (used by JS) -->
+                <img id="upscaled-image" src="" alt="Imagem upscaled" style="display: none;">
+                <span id="upscaled-size" style="display: none;"></span>
+                <div id="loading-overlay" class="loading-overlay">
+                    <div class="spinner"></div>
+                    <p id="loading-text" class="loading-text">Carregando modelo...</p>
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill"></div>
                     </div>
                 </div>
 
