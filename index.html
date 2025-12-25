@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Upscale suas imagens com IA gratuitamente. Aumente a resolução de fotos usando tecnologia ESRGAN diretamente no navegador.">
+    <meta name="keywords" content="upscale, imagem, IA, ESRGAN, resolução, grátis, online">
+    <title>PixelBoost - AI Image Upscaler</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Full-Screen Loading Overlay -->
+    <div id="fullscreen-loader" class="fullscreen-loader">
+        <div class="loader-content">
+            <div class="loader-logo">
+                <svg class="loader-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </div>
+            <div class="loader-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <h2 id="loader-title" class="loader-title">Processando sua imagem</h2>
+            <p id="loader-status" class="loader-status">Carregando modelo de IA...</p>
+            <div class="loader-progress">
+                <div id="loader-progress-fill" class="loader-progress-fill"></div>
+            </div>
+            <p class="loader-hint">Isso pode levar alguns segundos na primeira vez</p>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+                <span class="logo-text">PixelBoost</span>
+            </div>
+            <p class="tagline">AI-Powered Image Upscaling</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Upload Section -->
+            <section id="upload-section" class="upload-section">
+                <div id="drop-zone" class="drop-zone">
+                    <div class="drop-zone-content">
+                        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <polyline points="17,8 12,3 7,8" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <h2 class="drop-zone-title">Arraste sua imagem aqui</h2>
+                        <p class="drop-zone-subtitle">ou clique para selecionar</p>
+                        <p class="drop-zone-formats">Suporta JPG, PNG, WebP</p>
+                    </div>
+                    <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" hidden>
+                </div>
+            </section>
+
+            <!-- Processing Section -->
+            <section id="processing-section" class="processing-section hidden">
+                <!-- Original Image Preview -->
+                <div class="preview-container">
+                    <div class="image-card original-card">
+                        <div class="card-header">
+                            <span class="card-label">Original</span>
+                            <span id="original-size" class="card-size"></span>
+                        </div>
+                        <div class="image-wrapper">
+                            <img id="original-image" src="" alt="Imagem original">
+                        </div>
+                    </div>
+
+                    <!-- Arrow -->
+                    <div class="arrow-container">
+                        <svg class="arrow-icon" viewBox="0 0 24 24" fill="none">
+                            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+
+                    <!-- Upscaled Image Preview -->
+                    <div class="image-card upscaled-card">
+                        <div class="card-header">
+                            <span class="card-label">Upscaled</span>
+                            <span id="upscaled-size" class="card-size"></span>
+                        </div>
+                        <div class="image-wrapper">
+                            <div id="loading-overlay" class="loading-overlay">
+                                <div class="spinner"></div>
+                                <p id="loading-text" class="loading-text">Carregando modelo...</p>
+                                <div class="progress-bar">
+                                    <div id="progress-fill" class="progress-fill"></div>
+                                </div>
+                            </div>
+                            <img id="upscaled-image" src="" alt="Imagem upscaled">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="controls">
+                    <div class="scale-selector">
+                        <label class="scale-label">Escala:</label>
+                        <div class="scale-buttons">
+                            <button id="scale-2x" class="scale-btn active" data-scale="2">2x</button>
+                            <button id="scale-4x" class="scale-btn" data-scale="4">4x</button>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button id="upscale-btn" class="btn btn-primary">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none">
+                                <path d="M15 3H21V9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M9 21H3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M21 3L14 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M3 21L10 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                            Fazer Upscale
+                        </button>
+                        <button id="download-btn" class="btn btn-secondary" disabled>
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none">
+                                <path
+                                    d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <polyline points="7,10 12,15 17,10" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            Download
+                        </button>
+                        <button id="reset-btn" class="btn btn-ghost">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none">
+                                <path
+                                    d="M3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C9.69494 21 7.59227 20.1334 6 18.7083"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                <path d="M3 5V9H7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                            Nova Imagem
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Comparison Slider Section -->
+            <section id="comparison-section" class="comparison-section hidden">
+                <h3 class="section-title">Comparação Antes / Depois</h3>
+                <div id="comparison-container" class="comparison-container">
+                    <img id="compare-before" class="compare-image compare-before" src="" alt="Antes">
+                    <img id="compare-after" class="compare-image compare-after" src="" alt="Depois">
+                    <div id="comparison-slider" class="comparison-slider">
+                        <div class="slider-line"></div>
+                        <div class="slider-handle">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="M8 12L4 8M4 8L8 4M4 8H12M16 12L20 16M20 16L16 20M20 16H12"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Powered by <a href="https://upscalerjs.com" target="_blank" rel="noopener">UpscalerJS</a> & ESRGAN</p>
+            <p class="footer-note">Processamento 100% local • Suas imagens nunca saem do seu dispositivo</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@upscalerjs/esrgan-slim@latest/dist/umd/2x.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@upscalerjs/esrgan-slim@latest/dist/umd/4x.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/upscaler@latest/dist/browser/umd/upscaler.min.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
